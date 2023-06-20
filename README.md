@@ -1,1 +1,1 @@
-Assumes the `bids` folder is symlinked to this working directory
+Set the `bids_dir` in the config
