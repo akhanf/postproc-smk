@@ -1,17 +1,28 @@
-bids_subject: 'bids/sub-{subject,[a-zA-Z0-9]+}'
+
+bids_dir: /scratch/akhanf/2_datasets/eplink_mri/eplink-spred2bids-noheudi/bids_baseline
 
 
 singularity:
-  fmriprep: 'docker://nipreps/fmriprep:20.2.6'
+  fmriprep: '/project/6050199/akhanf/singularity/bids-apps/nipreps_fmriprep_23.1.0.sif'
   hippunfold: '/project/6050199/akhanf/singularity/bids-apps/khanlab_hippunfold_v1.0.0.sif'
   freesurfer: '/project/6050199/akhanf/singularity/bids-apps/freesurfer_freesurfer_7.2.0.sif'
 
 
 fs_license_file: '/project/ctb-akhanf/akhanf/opt/freesurfer/.license'
 
-
-pybids_inputs_freesurfer:
-  T1w:
+pybids_inputs:
+  dwi:
+    filters:
+      suffix: 'dwi'
+      extension: '.nii.gz'
+      datatype: 'dwi'
+    wildcards:
+      - subject
+      - session
+      - acquisition
+      - run
+      - direction
+  t1:
     filters:
       suffix: 'T1w'
       extension: '.nii.gz'
@@ -21,3 +32,7 @@ pybids_inputs_freesurfer:
       - session
       - acquisition
       - run
+
+
+
+
