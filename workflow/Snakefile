@@ -13,39 +13,9 @@ inputs = snakebids.generate_inputs(
     derivatives=config.get("derivatives", None),
     participant_label=config.get("participant_label", None),
     exclude_participant_label=config.get("exclude_participant_label", None),
-    use_bids_inputs=True,
 )
 
-
-subj_set_intersection = None
-subj_zip_list = None
-
-for bidsinput in config["pybids_inputs"].keys():
-   zipl = inputs.input_zip_lists[bidsinput]
-   if "session" in zipl:
-       # has session, so we have to zip, then use set to remove duplicates
-       subj_set = set(zip(zipl["subject"], zipl["session"]))
-   else:
-       # does not have session, so we can remove duplicates easily by using set
-       subj_set = set(zipl["subject"])
-
-   subj_set_intersection = (
-       subj_set
-       if subj_set_intersection == None
-       else subj_set.intersection(subj_set_intersection)
-   )
-
-if "session" in zipl:
-   (subzip, seszip) = zip(*list(subj_set_intersection))  # zip it up again
-   subj_zip_list = {
-       "subject": subzip,
-       "session": seszip,
-   }  # create the new subj_zip_list
-
-else:
-   subj_zip_list = {"subject": list(subj_set_intersection)}
-
-
+subjects = inputs.subjects
 subj_wildcards=inputs.subj_wildcards
 
 #this adds constraints to the bids naming
@@ -56,14 +26,11 @@ wildcard_constraints:  **snakebids.get_wildcard_constraints(config['pybids_input
 
 rule all:
     input:
-        #'fmriprep/dataset_description.json',
-#        expand(bids(root='hippunfold',**subj_wildcards),zip,**subj_zip_list),
-        expand(bids(root='freesurfer',include_subject_dir=False,include_session_dir=False,**subj_wildcards),zip,**inputs.input_zip_lists['t1']),
-        expand(bids(root='fmriprep',include_subject_dir=False,include_session_dir=False,**subj_wildcards),zip,**inputs.input_zip_lists['t1'])
+        expand('hippunfold_{variant}_{version}/hippunfold/sub-{subject}',subject=inputs.subjects,variant=config['variant_opts']['hippunfold'].keys(),version=config['singularity']['hippunfold'].keys()),
+        expand('snakedwi/sub-{subject}',subject=inputs.subjects)
 
-include: 'rules/freesurfer.smk'
-include: 'rules/fmriprep.smk'
-#include: 'rules/hippunfold.smk'
+include: 'rules/hippunfold.smk'
+include: 'rules/snakedwi.smk'
 
 
 

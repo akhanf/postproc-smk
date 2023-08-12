@@ -1,11 +1,20 @@
 
-bids_dir: /scratch/akhanf/2_datasets/eplink_mri/eplink-spred2bids-noheudi/bids_baseline
+bids_dir: /project/6050199/akhanf/cfmm-bids/data/Kohler/HcECT/bids
 
+opts:
+  hippunfold: '--keep-work --atlas bigbrain'
+  snakedwi: '--use-eddy-gpu --use-singularity --singularity-prefix $SNAKEMAKE_SINGULARITY_DIR'
+
+variant_opts:
+  hippunfold:
+    t1: '--keep-work --modality T1w'
+    t1_synthseg: '--keep-work --modality T1w --force-nnunet-model synthseg_v0.2'
+    t2: '--keep-work --modality T2w --output-spaces T1w --t1-reg-template --generate-myelin-map'
+    t2_synthseg: '--keep-work --modality T2w --output-spaces T1w --t1-reg-template --generate-myelin-map --force-nnunet-model synthseg_v0.2'
 
 singularity:
-  fmriprep: '/project/6050199/akhanf/singularity/bids-apps/nipreps_fmriprep_23.1.0.sif'
-  hippunfold: '/project/6050199/akhanf/singularity/bids-apps/khanlab_hippunfold_v1.0.0.sif'
-  freesurfer: '/project/6050199/akhanf/singularity/bids-apps/freesurfer_freesurfer_7.2.0.sif'
+  hippunfold:
+    v1.3.3: '/project/6050199/akhanf/singularity/bids-apps/khanlab_hippunfold_v1.3.3.sif'
 
 
 fs_license_file: '/project/ctb-akhanf/akhanf/opt/freesurfer/.license'
