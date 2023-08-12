@@ -1,3 +1,5 @@
+# postproc-smk
+
 WIP workflow to automate running bids apps (e.g. hippunfold, snakedwi) with different options (variants) or versions.
 
 Apps use `$SLURM_TMPDIR` as temporary output, copying results afterwards. 
