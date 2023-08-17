@@ -8,4 +8,7 @@ Set inputs, options, app versions etc in config.
 
 Snakedwi is not fully integrated yet (e.g. you need to git clone snakedwi into `snakedwi_src` currently)..
 
-
+Can use the following venv:
+```
+source /project/ctb-akhanf/akhanf/opt/virtualenvs/snakebids/bin/activate
+```
