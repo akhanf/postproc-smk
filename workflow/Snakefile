@@ -15,11 +15,23 @@ inputs = snakebids.generate_inputs(
     exclude_participant_label=config.get("exclude_participant_label", None),
 )
 
-subjects = inputs.subjects
+inputs_dwionly = snakebids.generate_inputs(
+    bids_dir=config["bids_dir"],
+    pybids_inputs=config["pybids_inputs_dwionly"],
+    pybids_database_dir=config.get("pybids_db_dir"),
+    pybids_reset_database=config.get("pybids_db_reset"),
+    derivatives=config.get("derivatives", None),
+    participant_label=config.get("participant_label", None),
+    exclude_participant_label=config.get("exclude_participant_label", None),
+)
+
 subj_wildcards=inputs.subj_wildcards
 
 #this adds constraints to the bids naming
 wildcard_constraints:  **snakebids.get_wildcard_constraints(config['pybids_inputs'])
+wildcard_constraints: 
+  subject='[a-zA-Z0-9]+',
+  session='[a-zA-Z0-9]+'
 
 #---- end snakebids boilerplate ------------------------------------------------
 
@@ -27,10 +39,28 @@ wildcard_constraints:  **snakebids.get_wildcard_constraints(config['pybids_input
 rule all:
     input:
         expand('hippunfold_{variant}_{version}/hippunfold/sub-{subject}',subject=inputs.subjects,variant=config['variant_opts']['hippunfold'].keys(),version=config['singularity']['hippunfold'].keys()),
-        expand('snakedwi/sub-{subject}',subject=inputs.subjects)
+        expand('hippunfolddwi_{variant}_{version}/hippunfold/sub-{subject}',subject=inputs_dwionly.subjects,variant=config['variant_opts']['hippunfolddwi'].keys(),version=config['singularity']['hippunfold'].keys()),
+        expand('snakedwi/sub-{subject}',subject=inputs_dwionly.subjects)
 
 include: 'rules/hippunfold.smk'
 include: 'rules/snakedwi.smk'
+
+
+
+rule extract_meanb500:
+    input:
+        dwi='snakedwi/sub-{subject}/ses-{session}/dwi/sub-{subject}_ses-{session}_desc-eddy_dwi.nii.gz',
+        bvec='snakedwi/sub-{subject}/ses-{session}/dwi/sub-{subject}_ses-{session}_desc-eddy_dwi.bvec',
+        bval='snakedwi/sub-{subject}/ses-{session}/dwi/sub-{subject}_ses-{session}_desc-eddy_dwi.bval',
+    output:
+        meanb500='snakedwi_b500/sub-{subject}/ses-{session}/dwi/sub-{subject}_ses-{session}_desc-eddy_b500.nii.gz'
+    shadow: 'minimal'
+    shell:
+        'dwiextract -shells 500 -fslgrad {input.bvec} {input.bval} {input.dwi} b500s.mif && '
+        'mrmath b500s.mif mean {output.meanb500} -axis 3'
+
+
+
 
 
 

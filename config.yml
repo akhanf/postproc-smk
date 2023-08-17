@@ -7,10 +7,13 @@ opts:
 
 variant_opts:
   hippunfold:
-    t1: '--keep-work --modality T1w'
-    t1_synthseg: '--keep-work --modality T1w --force-nnunet-model synthseg_v0.2'
-    t2: '--keep-work --modality T2w --output-spaces T1w --t1-reg-template --generate-myelin-map'
-    t2_synthseg: '--keep-work --modality T2w --output-spaces T1w --t1-reg-template --generate-myelin-map --force-nnunet-model synthseg_v0.2'
+    t1: '--modality T1w'
+    t1_synthseg: '--modality T1w --force-nnunet-model synthseg_v0.2'
+    t2: '--modality T2w --output-spaces T1w --t1-reg-template --generate-myelin-map'
+    t2_synthseg: '--modality T2w --output-spaces T1w --t1-reg-template --generate-myelin-map --force-nnunet-model synthseg_v0.2'
+  hippunfolddwi:
+    b500: '--modality hippb500'
+    b500_synthseg: '--modality hippb500 --force-nnunet-model synthseg_v0.2'
 
 singularity:
   hippunfold:
@@ -42,6 +45,19 @@ pybids_inputs:
       - acquisition
       - run
 
+
+pybids_inputs_dwionly:
+  dwi:
+    filters:
+      suffix: 'dwi'
+      extension: '.nii.gz'
+      datatype: 'dwi'
+    wildcards:
+      - subject
+      - session
+      - acquisition
+      - run
+      - direction
 
 
 
